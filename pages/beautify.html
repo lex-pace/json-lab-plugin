@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>JSON 美化 · JSON Tools</title>
+  <link rel="stylesheet" href="../shared/styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="app-title">
+      <span class="logo"><img src="../icons/json-tools-logo.svg" alt="JSON Tools" /></span>
+      <span class="name">JSON 美化</span>
+      <span class="badge">Beautify</span>
+    </div>
+    <nav class="app-tabs">
+      <a href="beautify.html" class="active"><i data-icon="braces"></i>美化</a>
+      <a href="compare.html"><i data-icon="arrows"></i>对比</a>
+      <a href="table.html"><i data-icon="table"></i>转表格</a>
+    </nav>
+  </header>
+
+  <div class="app-body">
+    <div class="toolbar">
+      <button class="btn primary" id="btn-format"><i data-icon="zap"></i>格式化</button>
+      <button class="btn" id="btn-minify"><i data-icon="minify"></i>压缩</button>
+      <button class="btn" id="btn-sort"><i data-icon="sortAsc"></i>排序 Key</button>
+      <span class="divider"></span>
+      <button class="btn subtle" id="btn-copy"><i data-icon="copy"></i>复制</button>
+      <button class="btn subtle" id="btn-download"><i data-icon="download"></i>下载</button>
+      <span class="divider"></span>
+      <button class="btn subtle" id="btn-sample"><i data-icon="sparkles"></i>示例</button>
+      <button class="btn subtle danger" id="btn-clear"><i data-icon="trash"></i>清空</button>
+      <span class="spacer"></span>
+      <div class="segmented" id="seg-view">
+        <button class="seg active" data-view="tree"><i data-icon="tree"></i>树</button>
+        <button class="seg" data-view="text"><i data-icon="code"></i>文本</button>
+      </div>
+      <span class="divider"></span>
+      <label>缩进
+        <select id="sel-indent">
+          <option value="2">2 空格</option>
+          <option value="4">4 空格</option>
+          <option value="tab">Tab</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="work-area">
+      <div class="pane">
+        <div class="pane-header">
+          <span class="left"><span class="dot"></span>输入 JSON</span>
+          <span id="input-info">0 字符</span>
+        </div>
+        <div class="pane-content">
+          <textarea class="code-input" id="input" placeholder='在此粘贴 JSON，例如：&#10;{&#10;  "name": "JSON 工具箱",&#10;  "version": "1.0.0"&#10;}'></textarea>
+        </div>
+      </div>
+      <div class="pane">
+        <div class="pane-header">
+          <span class="left"><span class="dot green"></span>结果</span>
+          <span id="result-info"></span>
+        </div>
+        <div class="pane-content" id="result"></div>
+      </div>
+    </div>
+
+    <div class="status-bar" id="status-bar">
+      <span class="indicator"><span class="dot"></span><span class="label" id="status">就绪</span></span>
+      <span style="margin-left:auto;">按 <span class="kbd">⌘ Enter</span> 格式化</span>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="../shared/icons.js"></script>
+  <script src="../shared/json-utils.js"></script>
+  <script src="beautify.js"></script>
+</body>
+</html>

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JSON 工具箱</title>
+  <link rel="stylesheet" href="../shared/styles.css" />
+  <style>
+    body {
+      width: 340px;
+      overflow: hidden;
+    }
+    .popup-wrap {
+      padding: 20px;
+      background: linear-gradient(180deg, var(--bg-elev) 0%, var(--bg) 100%);
+    }
+    .popup-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+    .popup-head .logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--primary), #6366f1);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+    .popup-head .logo svg { width: 22px; height: 22px; }
+    .popup-head .logo img { width: 40px; height: 40px; border-radius: 10px; display: block; }
+    .popup-head .name {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+    .popup-head .ver {
+      font-size: 10px;
+      color: var(--text-mute);
+      padding: 2px 8px;
+      background: var(--bg);
+      border: 1px solid var(--border-strong);
+      border-radius: 999px;
+      margin-left: auto;
+      font-family: var(--mono);
+      font-weight: 500;
+    }
+    .popup-sub {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-mute);
+      margin: 8px 0 18px;
+      padding: 8px 12px;
+      background: var(--primary-soft);
+      border-radius: var(--radius);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+    .popup-sub svg { width: 14px; height: 14px; color: var(--primary); }
+
+    /* —— 当前页 JSON 捕获 —— */
+    .capture-section {
+      margin: 0 0 14px;
+      padding: 12px 14px;
+      background: rgba(59, 130, 246, 0.06);
+      border: 1px solid rgba(59, 130, 246, 0.15);
+      border-radius: 10px;
+    }
+    .capture-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .capture-header svg { width: 15px; height: 15px; color: var(--primary); }
+    .capture-title { font-size: 12px; font-weight: 600; color: var(--text); flex: 1; }
+    .capture-status {
+      font-size: 11px;
+      color: var(--text-mute);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .capture-list { display: flex; flex-direction: column; gap: 6px; max-height: 180px; overflow-y: auto; }
+    .capture-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all 180ms;
+      background: var(--bg-elev);
+    }
+    .capture-item:hover {
+      border-color: var(--primary);
+      background: rgba(59, 130, 246, 0.08);
+    }
+    .ci-badge {
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: rgba(59, 130, 246, 0.15);
+      color: var(--primary);
+      flex-shrink: 0;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .ci-preview {
+      flex: 1;
+      font-size: 11px;
+      color: var(--text-soft);
+      font-family: 'JetBrains Mono', monospace;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
+    }
+    .ci-meta {
+      font-size: 10px;
+      color: var(--text-dim);
+      flex-shrink: 0;
+    }
+
+    .menu-list { display: flex; flex-direction: column; gap: 8px; }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      transition: var(--transition);
+      text-decoration: none;
+      color: var(--text);
+      background: var(--bg);
+      position: relative;
+      overflow: hidden;
+    }
+    .menu-item::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--accent, var(--primary));
+      opacity: 0;
+      transition: var(--transition);
+    }
+    .menu-item:hover {
+      border-color: var(--accent, var(--primary));
+      background: var(--bg-elev);
+      transform: translateX(2px);
+      box-shadow: var(--shadow);
+    }
+    .menu-item:hover::before { opacity: 1; }
+
+    .menu-item .icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      background: var(--icon-bg, var(--primary-soft));
+      color: var(--accent, var(--primary));
+      transition: var(--transition);
+    }
+    .menu-item:hover .icon { transform: scale(1.05); }
+    .menu-item .icon svg { width: 22px; height: 22px; }
+
+    .menu-item.b1 { --accent: var(--primary); --icon-bg: var(--primary-soft); }
+    .menu-item.b2 { --accent: var(--warning); --icon-bg: var(--warning-soft); }
+    .menu-item.b3 { --accent: var(--success); --icon-bg: var(--success-soft); }
+
+    .menu-item .meta { flex: 1; min-width: 0; }
+    .menu-item .meta .t {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+    .menu-item .meta .d {
+      font-size: 12px;
+      color: var(--text-mute);
+      margin-top: 3px;
+      line-height: 1.4;
+    }
+    .menu-item .arrow {
+      color: var(--text-dim);
+      transition: var(--transition);
+      display: inline-flex;
+    }
+    .menu-item .arrow svg { width: 16px; height: 16px; }
+    .menu-item:hover .arrow {
+      color: var(--accent, var(--primary));
+      transform: translateX(3px);
+    }
+
+    .popup-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-strong);
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+    .popup-foot .kbd {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .popup-foot kbd {
+      display: inline-block;
+      padding: 1px 5px;
+      background: var(--bg);
+      border: 1px solid var(--border-strong);
+      border-radius: 3px;
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-soft);
+    }
+  </style>
+</head>
+<body>
+  <div class="popup-wrap">
+    <div class="popup-head">
+      <span class="logo"><img src="../icons/json-tools-logo.svg" alt="JSON Tools" /></span>
+      <span class="name">JSON Tools</span>
+      <span class="ver">v1.0</span>
+    </div>
+    <div class="popup-sub">
+      <i data-icon="info"></i>
+      <span>本地处理 · 数据不离开浏览器 · 无网络请求</span>
+    </div>
+
+    <div class="capture-section" id="capture-section">
+      <div class="capture-header">
+        <i data-icon="downloadCloud"></i>
+        <span class="capture-title">导入当前页 JSON</span>
+        <span class="capture-status" id="capture-status">检测中...</span>
+      </div>
+      <div class="capture-list" id="capture-list"></div>
+    </div>
+
+    <div class="menu-list">
+      <a class="menu-item b1" href="#" data-page="beautify">
+        <span class="icon"><i data-icon="braces"></i></span>
+        <span class="meta">
+          <div class="t">JSON 美化</div>
+          <div class="d">格式化 / 压缩 / 折叠树 / 路径提取</div>
+        </span>
+        <span class="arrow"><i data-icon="arrowRight"></i></span>
+      </a>
+
+      <a class="menu-item b2" href="#" data-page="compare">
+        <span class="icon"><i data-icon="arrows"></i></span>
+        <span class="meta">
+          <div class="t">JSON 对比</div>
+          <div class="d">逐键递归比较，忽略字段干扰</div>
+        </span>
+        <span class="arrow"><i data-icon="arrowRight"></i></span>
+      </a>
+
+      <a class="menu-item b3" href="#" data-page="table">
+        <span class="icon"><i data-icon="table"></i></span>
+        <span class="meta">
+          <div class="t">JSON 转表格</div>
+          <div class="d">嵌套展平 · 搜索 · CSV / Markdown</div>
+        </span>
+        <span class="arrow"><i data-icon="arrowRight"></i></span>
+      </a>
+    </div>
+
+    <div class="popup-foot">
+      <span>⌘ Enter 执行操作</span>
+      <span class="kbd"><kbd>⌘</kbd><kbd>↵</kbd></span>
+    </div>
+  </div>
+
+  <script src="../shared/icons.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

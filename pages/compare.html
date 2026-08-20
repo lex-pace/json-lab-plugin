@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>JSON 对比 · JSON Tools</title>
+  <link rel="stylesheet" href="../shared/styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="app-title">
+      <span class="logo"><img src="../icons/json-tools-logo.svg" alt="JSON Tools" /></span>
+      <span class="name">JSON 对比</span>
+      <span class="badge">Compare</span>
+    </div>
+    <nav class="app-tabs">
+      <a href="beautify.html"><i data-icon="braces"></i>美化</a>
+      <a href="compare.html" class="active"><i data-icon="arrows"></i>对比</a>
+      <a href="table.html"><i data-icon="table"></i>转表格</a>
+    </nav>
+  </header>
+
+  <div class="app-body">
+    <div class="toolbar">
+      <button class="btn primary" id="btn-compare"><i data-icon="zap"></i>对比</button>
+      <button class="btn" id="btn-swap"><i data-icon="arrowLeftRight"></i>交换</button>
+      <span class="divider"></span>
+      <button class="btn subtle" id="btn-sample"><i data-icon="sparkles"></i>示例</button>
+      <button class="btn subtle danger" id="btn-clear"><i data-icon="trash"></i>清空</button>
+      <span class="spacer"></span>
+      <div id="diff-summary"></div>
+    </div>
+
+    <div class="work-area" style="flex: 0 0 340px;">
+      <div class="pane">
+        <div class="pane-header">
+          <span class="left"><span class="dot"></span>JSON A · 旧</span>
+          <span id="info-a">0 字符</span>
+        </div>
+        <div class="pane-content">
+          <textarea class="code-input" id="input-a" placeholder='左侧 JSON（旧版）'></textarea>
+        </div>
+      </div>
+      <div class="pane">
+        <div class="pane-header">
+          <span class="left"><span class="dot amber"></span>JSON B · 新</span>
+          <span id="info-b">0 字符</span>
+        </div>
+        <div class="pane-content">
+          <textarea class="code-input" id="input-b" placeholder='右侧 JSON（新版）'></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; min-height:0;">
+      <div class="pane-header">
+        <span class="left"><span class="dot green"></span>差异（增 / 删 / 改）</span>
+        <span id="diff-count"></span>
+      </div>
+      <div class="pane-content" id="result"></div>
+    </div>
+
+    <div class="status-bar" id="status-bar">
+      <span class="indicator"><span class="dot"></span><span class="label" id="status">就绪</span></span>
+      <span style="margin-left:auto;">按 <span class="kbd">⌘ Enter</span> 对比</span>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="../shared/icons.js"></script>
+  <script src="../shared/json-utils.js"></script>
+  <script src="compare.js"></script>
+</body>
+</html>

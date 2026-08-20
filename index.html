@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="icons/json-tools-logo.svg" />
+  <title>JSON Tools · 浏览器 JSON 工具箱</title>
+  <link rel="stylesheet" href="shared/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <!-- ============ 侧边栏 ============ -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-head">
+        <span class="logo"><img src="icons/json-tools-logo.svg" alt="JSON Tools" /></span>
+        <div class="brand">
+          <span class="name">JSON Tools</span>
+          <span class="ver">v1.0.0</span>
+        </div>
+        <button class="head-tip" id="author-btn" title="打赏作者 · 支持一下" aria-label="打赏作者">
+          <i data-icon="heart"></i>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">工具</div>
+        <button class="nav-item active" data-panel="beautify" data-tip="JSON 美化">
+          <i data-icon="braces"></i>
+          <span class="nav-text">JSON 美化</span>
+          <span class="nav-badge">Beautify</span>
+        </button>
+        <button class="nav-item" data-panel="compare" data-tip="JSON 对比">
+          <i data-icon="arrows"></i>
+          <span class="nav-text">JSON 对比</span>
+          <span class="nav-badge">Compare</span>
+        </button>
+        <button class="nav-item" data-panel="table" data-tip="JSON 转表格">
+          <i data-icon="table"></i>
+          <span class="nav-text">JSON 转表格</span>
+          <span class="nav-badge">Table</span>
+        </button>
+        <div class="nav-section-label" style="margin-top:12px;">关于</div>
+        <button class="nav-item" data-panel="help" data-tip="使用说明">
+          <i data-icon="helpCircle"></i>
+          <span class="nav-text">使用说明</span>
+          <span class="nav-badge">Help</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-foot">
+        <button class="foot-btn" id="theme-btn" title="切换深色/浅色主题" data-tip="切换主题">
+          <i class="theme-icon-dark" data-icon="moon"></i>
+          <i class="theme-icon-light" data-icon="sun"></i>
+        </button>
+        <button class="foot-btn" id="collapse-btn" title="折叠/展开侧边栏">
+          <i class="collapse-open" data-icon="chevronRight"></i>
+          <i class="collapse-close" data-icon="chevronLeft"></i>
+          <span class="lbl">折叠侧边栏</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ============ 主区 ============ -->
+    <main class="app-main">
+
+      <!-- ====== 面板：JSON 美化 ====== -->
+      <section class="panel active" id="panel-beautify">
+        <div class="toolbar">
+          <button class="btn primary" data-action="beautify-format"><i data-icon="zap"></i>格式化</button>
+          <button class="btn" data-action="beautify-minify"><i data-icon="minify"></i>压缩</button>
+          <button class="btn" data-action="beautify-sort"><i data-icon="sortAsc"></i>排序 Key</button>
+          <span class="divider"></span>
+          <button class="btn subtle" data-action="beautify-copy"><i data-icon="copy"></i>复制</button>
+          <button class="btn subtle" data-action="beautify-download"><i data-icon="download"></i>下载</button>
+          <span class="divider"></span>
+          <button class="btn subtle" data-action="beautify-sample"><i data-icon="sparkles"></i>示例</button>
+          <button class="btn subtle danger" data-action="beautify-clear"><i data-icon="trash"></i>清空</button>
+          <span class="spacer"></span>
+          <div class="segmented" id="seg-view">
+            <button class="seg active" data-view="tree"><i data-icon="tree"></i>树</button>
+            <button class="seg" data-view="text"><i data-icon="code"></i>文本</button>
+          </div>
+          <span class="divider"></span>
+          <label>缩进
+            <select id="sel-indent">
+              <option value="2">2 空格</option>
+              <option value="4">4 空格</option>
+              <option value="tab">Tab</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="work-area">
+          <div class="pane">
+            <div class="pane-header">
+              <span class="left"><span class="dot"></span>输入 JSON</span>
+              <span id="b-input-info">0 字符</span>
+            </div>
+            <div class="pane-content">
+              <textarea class="code-input" id="b-input" placeholder='在此粘贴 JSON，例如：&#10;{&#10;  "name": "JSON 工具箱",&#10;  "version": "1.0.0"&#10;}'></textarea>
+            </div>
+          </div>
+          <div class="pane">
+            <div class="pane-header">
+              <span class="left"><span class="dot green"></span>结果</span>
+              <div style="display:flex; align-items:center; gap:10px; text-transform:none; letter-spacing:0;">
+                <div class="search-box" id="b-search-box">
+                  <i data-icon="search"></i>
+                  <input type="text" id="b-search-input" placeholder="搜索 Key / 值…" autocomplete="off" />
+                  <button class="clear-btn" id="b-search-clear" title="清除"><i data-icon="x"></i></button>
+                  <span class="match-count" id="b-match-count" style="display:none;"></span>
+                </div>
+                <div class="segmented" id="b-search-mode">
+                  <button class="seg" data-smode="collapse" title="折叠查找：只展开命中路径">折叠</button>
+                  <button class="seg active" data-smode="expand" title="展开搜索：高亮全部命中">展开</button>
+                </div>
+                <div class="segmented" id="b-search-match">
+                  <button class="seg" data-smatch="fuzzy" title="模糊匹配（子串，忽略大小写）">模糊</button>
+                  <button class="seg active" data-smatch="exact" title="精确匹配（完整相等）">精确</button>
+                </div>
+                <span id="b-result-info"></span>
+              </div>
+            </div>
+            <div class="pane-content" id="b-result"></div>
+            <div class="path-bar" id="b-path-bar" hidden>
+              <i data-icon="mousePointer"></i>
+              <span class="path-text" id="b-path-text"></span>
+              <button class="path-copy" id="b-path-copy" title="复制路径"><i data-icon="copy"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="status-bar" id="b-status-bar">
+          <span class="indicator"><span class="dot"></span><span class="label" id="b-status">就绪</span></span>
+          <span style="margin-left:auto;">按 <span class="kbd">⌘ Enter</span> 格式化</span>
+        </div>
+      </section>
+
+      <!-- ====== 面板：JSON 对比 ====== -->
+      <section class="panel" id="panel-compare">
+        <div class="toolbar">
+          <button class="btn primary" data-action="compare-run"><i data-icon="zap"></i>对比</button>
+          <button class="btn" data-action="compare-swap"><i data-icon="arrowLeftRight"></i>交换</button>
+          <span class="divider"></span>
+          <button class="btn subtle" data-action="compare-sample"><i data-icon="sparkles"></i>示例</button>
+          <button class="btn subtle danger" data-action="compare-clear"><i data-icon="trash"></i>清空</button>
+          <span class="divider"></span>
+          <button class="btn subtle" id="c-ignore-toggle"><i data-icon="filter"></i>忽略字段</button>
+          <span class="spacer"></span>
+          <div id="c-diff-summary"></div>
+        </div>
+
+        <div class="ignore-bar" id="c-ignore-bar" hidden>
+          <i data-icon="filter"></i>
+          <span class="ignore-label">忽略字段：</span>
+          <div class="multi-select" id="c-ignore-select">
+            <button class="ms-trigger" id="c-ms-trigger">
+              <span class="ms-placeholder" id="c-ms-placeholder">选择要忽略的 Key…</span>
+              <i data-icon="chevronDown"></i>
+            </button>
+            <div class="ms-dropdown" id="c-ms-dropdown" hidden>
+              <div class="ms-search">
+                <input type="text" id="c-ms-search" placeholder="搜索 Key…" autocomplete="off" />
+              </div>
+              <div class="ms-actions">
+                <button class="ms-action" id="c-ms-all">全选</button>
+                <button class="ms-action" id="c-ms-none">清空</button>
+              </div>
+              <div class="ms-options" id="c-ms-options"></div>
+            </div>
+          </div>
+          <span class="ms-count" id="c-ms-count" style="display:none;"></span>
+        </div>
+
+        <div class="work-area" style="flex: 0 0 340px;">
+          <div class="pane">
+            <div class="pane-header">
+              <span class="left"><span class="dot"></span>JSON A · 旧</span>
+              <span id="c-info-a">0 字符</span>
+            </div>
+            <div class="pane-content">
+              <textarea class="code-input" id="c-input-a" placeholder='左侧 JSON（旧版）'></textarea>
+            </div>
+          </div>
+          <div class="pane">
+            <div class="pane-header">
+              <span class="left"><span class="dot amber"></span>JSON B · 新</span>
+              <span id="c-info-b">0 字符</span>
+            </div>
+            <div class="pane-content">
+              <textarea class="code-input" id="c-input-b" placeholder='右侧 JSON（新版）'></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div style="flex:1; display:flex; flex-direction:column; min-height:0;">
+          <div class="pane-header">
+            <span class="left"><span class="dot green"></span>差异（增 / 删 / 改）</span>
+            <span id="c-diff-count"></span>
+          </div>
+          <div class="pane-content" id="c-result"></div>
+        </div>
+
+        <div class="status-bar" id="c-status-bar">
+          <span class="indicator"><span class="dot"></span><span class="label" id="c-status">就绪</span></span>
+          <span style="margin-left:auto;">按 <span class="kbd">⌘ Enter</span> 对比</span>
+        </div>
+      </section>
+
+      <!-- ====== 面板：JSON 转表格 ====== -->
+      <section class="panel" id="panel-table">
+        <div class="toolbar">
+          <button class="btn primary" data-action="table-convert"><i data-icon="zap"></i>转换</button>
+          <span class="divider"></span>
+          <button class="btn" data-action="table-csv"><i data-icon="copy"></i>复制 CSV</button>
+          <button class="btn" data-action="table-md"><i data-icon="copy"></i>复制 Markdown</button>
+          <button class="btn" data-action="table-download"><i data-icon="download"></i>下载 CSV</button>
+          <span class="divider"></span>
+          <button class="btn subtle" data-action="table-sample"><i data-icon="sparkles"></i>示例</button>
+          <button class="btn subtle danger" data-action="table-clear"><i data-icon="trash"></i>清空</button>
+          <span class="spacer"></span>
+          <label><input type="checkbox" class="checkbox" id="t-chk-wrap" checked />自动包装单个对象</label>
+          <label><input type="checkbox" class="checkbox" id="t-chk-flatten" checked />展平嵌套对象（address.city）</label>
+        </div>
+
+        <div style="display:flex; flex-direction:column; flex: 0 0 300px; border-bottom:1px solid var(--border-strong);">
+          <div class="pane-header">
+            <span class="left"><span class="dot"></span>输入 JSON（对象数组）</span>
+            <span id="t-input-info">0 字符</span>
+          </div>
+          <div style="flex:1; position:relative;">
+            <textarea class="code-input" id="t-input" placeholder='粘贴对象数组，例如：&#10;[&#10;  { "id": 1, "name": "张三", "age": 28 },&#10;  { "id": 2, "name": "李四", "age": 34 }&#10;]'></textarea>
+          </div>
+        </div>
+
+        <div style="flex:1; display:flex; flex-direction:column; min-height:0;">
+          <div class="pane-header">
+            <span class="left"><span class="dot green"></span>表格结果</span>
+            <div style="display:flex; align-items:center; gap:10px; text-transform:none; letter-spacing:0;">
+              <div class="search-box" id="t-search-box">
+                <i data-icon="search"></i>
+                <input type="text" id="t-search-input" placeholder="搜索单元格内容…" autocomplete="off" />
+                <button class="clear-btn" id="t-search-clear" title="清除"><i data-icon="x"></i></button>
+                <span class="match-count" id="t-match-count" style="display:none;"></span>
+              </div>
+              <span id="t-result-info"></span>
+            </div>
+          </div>
+          <div class="pane-content" id="t-result"></div>
+        </div>
+
+        <div class="status-bar" id="t-status-bar">
+          <span class="indicator"><span class="dot"></span><span class="label" id="t-status">就绪</span></span>
+          <span style="margin-left:auto;">按 <span class="kbd">⌘ Enter</span> 转换 · <span class="kbd">⌘ F</span> 搜索</span>
+        </div>
+      </section>
+
+      <!-- ====== 面板：使用说明 ====== -->
+      <section class="panel" id="panel-help">
+        <div class="help-wrap">
+          <!-- Hero -->
+          <div class="help-hero">
+            <span class="help-hero-logo"><img src="icons/json-tools-logo.svg" alt="JSON Tools Logo" /></span>
+            <div class="help-hero-text">
+              <div class="help-eyebrow">DEVELOPER TOOLKIT · PRIVACY FIRST</div>
+              <h1 class="help-hero-title">JSON Tools</h1>
+              <p class="help-hero-sub">更快读懂、整理、对比和导出 JSON。所有处理都在浏览器本地完成。</p>
+              <div class="help-hero-tags">
+                <span class="htag">本地处理</span>
+                <span class="htag">零依赖</span>
+                <span class="htag">MV3</span>
+                <span class="htag">开源透明</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 功能卡片网格 -->
+          <div class="help-cards">
+            <div class="help-card help-card-action" data-help-panel="beautify" tabindex="0" role="button">
+              <div class="hc-icon hc-blue"><i data-icon="braces"></i></div>
+              <h3 class="hc-title">JSON 美化</h3>
+              <p class="hc-desc">把杂乱的 JSON 格式化成可折叠的语法高亮树。</p>
+              <ul class="hc-features">
+                <li>格式化 / 压缩 / 排序 Key</li>
+                <li>多层级全展开树视图</li>
+                <li>搜索高亮（精确 / 模糊）</li>
+                <li>悬停提取 JSONPath</li>
+                <li>大整数防精度丢失</li>
+              </ul>
+            </div>
+
+            <div class="help-card help-card-action" data-help-panel="compare" tabindex="0" role="button">
+              <div class="hc-icon hc-green"><i data-icon="arrows"></i></div>
+              <h3 class="hc-title">JSON 对比</h3>
+              <p class="hc-desc">逐键递归比较两份 JSON，精准定位差异。</p>
+              <ul class="hc-features">
+                <li>增 / 删 / 改 三类差异高亮</li>
+                <li>下拉多选忽略指定字段</li>
+                <li>完整差异路径显示</li>
+                <li>差异统计徽章</li>
+              </ul>
+            </div>
+
+            <div class="help-card help-card-action" data-help-panel="table" tabindex="0" role="button">
+              <div class="hc-icon hc-purple"><i data-icon="table"></i></div>
+              <h3 class="hc-title">JSON 转表格</h3>
+              <p class="hc-desc">对象数组转可视表格，支持嵌套展平。</p>
+              <ul class="hc-features">
+                <li>嵌套对象自动展平（address.city）</li>
+                <li>表格搜索高亮</li>
+                <li>导出 CSV / Markdown</li>
+                <li>CSV 带 BOM 支持 Excel</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- 使用流程 + 常用场景 -->
+          <div class="help-flow-card">
+            <div class="help-flow-head">
+              <div>
+                <div class="help-eyebrow">WORKFLOW</div>
+                <h2 class="help-h2">三步处理你的 JSON</h2>
+              </div>
+              <span class="help-flow-note">从当前页面直接捕获，或粘贴本地数据</span>
+            </div>
+            <div class="help-flow">
+              <div class="help-flow-step"><span class="flow-num">01</span><div><strong>输入或捕获</strong><span>粘贴 JSON，或从当前页一键导入</span></div></div>
+              <span class="flow-arrow">→</span>
+              <div class="help-flow-step"><span class="flow-num">02</span><div><strong>选择工具</strong><span>美化、对比、展平为表格</span></div></div>
+              <span class="flow-arrow">→</span>
+              <div class="help-flow-step"><span class="flow-num">03</span><div><strong>复制或下载</strong><span>输出 JSON、CSV、Markdown</span></div></div>
+            </div>
+            <div class="scenario-row"><span class="scenario-label">适合这些场景</span><span class="scenario-chip">调试 API 返回值</span><span class="scenario-chip">核对配置变更</span><span class="scenario-chip">整理接口数据</span><span class="scenario-chip">导入 Excel</span></div>
+          </div>
+
+          <!-- 快捷键 + 隐私（两栏） -->
+          <div class="help-two-col">
+            <div class="help-col">
+              <h2 class="help-h2"><i data-icon="keyboard"></i> 快捷键</h2>
+              <div class="help-shortcut-grid">
+                <div class="shortcut-item"><span class="shortcut-keys"><kbd>⌘</kbd><kbd>↵</kbd></span><span class="shortcut-desc">执行操作</span></div>
+                <div class="shortcut-item"><span class="shortcut-keys"><kbd>⌘</kbd><kbd>F</kbd></span><span class="shortcut-desc">聚焦搜索</span></div>
+                <div class="shortcut-item"><span class="shortcut-keys"><kbd>Esc</kbd></span><span class="shortcut-desc">清除 / 关闭</span></div>
+              </div>
+            </div>
+            <div class="help-col">
+              <h2 class="help-h2"><i data-icon="shield"></i> 隐私声明</h2>
+              <p class="help-p">纯前端处理，<strong>数据不离开浏览器</strong>。导入当前页仅在你点击捕获时读取，不做后台监控；无网络请求、无第三方分析。</p>
+            </div>
+          </div>
+
+          <!-- 打赏区 -->
+          <div class="help-donate">
+            <div class="donate-left">
+              <div class="donate-heart"><i data-icon="heart"></i></div>
+              <div>
+                <h2 class="donate-title">支持作者</h2>
+                <p class="donate-desc">JSON Tools 完全免费开源。如果这个工具帮到了你，<br/>可以请作者喝杯咖啡 ☕ 支持持续维护。</p>
+                <button class="btn primary" id="help-author-btn"><i data-icon="heart"></i> 打赏作者</button>
+              </div>
+            </div>
+            <div class="donate-qr">
+              <img class="donation-qr" src="icons/donation-qr.jpg" alt="作者赞赏二维码" />
+              <span class="qr-tip">扫码支持作者</span>
+            </div>
+          </div>
+
+          <div class="help-footer">
+            <span>JSON Tools v1.0.0 · Made with ❤</span>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- 「打赏作者」弹窗 -->
+  <div class="modal-mask" id="author-modal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="author-title">
+      <button class="modal-close" id="author-close" title="关闭" aria-label="关闭"><i data-icon="x"></i></button>
+      <div class="modal-head">
+        <span class="modal-logo"><img src="icons/json-tools-logo.svg" alt="JSON Tools" /></span>
+        <div>
+          <div class="modal-title" id="author-title">打赏作者</div>
+          <div class="modal-sub">请作者喝杯咖啡 · 支持开源</div>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="author-qr-slot">
+          <img class="donation-qr" src="icons/donation-qr.jpg" alt="作者赞赏二维码" />
+          <span class="qr-tip">扫码支持作者</span>
+        </div>
+        <ul class="author-meta">
+          <li><span class="k">邮箱</span><span class="v">author@example.com</span></li>
+          <li><span class="k">仓库</span><span class="v">github.com/yourname/json-tools</span></li>
+          <li><span class="k">版本</span><span class="v">v1.0.0</span></li>
+        </ul>
+        <p class="author-note">JSON Tools 是一个开源、零依赖的 JSON 工具集，遇到任何问题或想法都欢迎反馈。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="shared/icons.js"></script>
+  <script src="shared/json-utils.js"></script>
+  <script src="shared/table-utils.js"></script>
+  <script src="index.js"></script>
+</body>
+</html>

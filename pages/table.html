@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>JSON 转表格 · JSON Tools</title>
+  <link rel="stylesheet" href="../shared/styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="app-title">
+      <span class="logo"><img src="../icons/json-tools-logo.svg" alt="JSON Tools" /></span>
+      <span class="name">JSON 转表格</span>
+      <span class="badge">Table</span>
+    </div>
+    <nav class="app-tabs">
+      <a href="beautify.html"><i data-icon="braces"></i>美化</a>
+      <a href="compare.html"><i data-icon="arrows"></i>对比</a>
+      <a href="table.html" class="active"><i data-icon="table"></i>转表格</a>
+    </nav>
+  </header>
+
+  <div class="app-body">
+    <div class="toolbar">
+      <button class="btn primary" id="btn-convert"><i data-icon="zap"></i>转换</button>
+      <span class="divider"></span>
+      <button class="btn" id="btn-csv"><i data-icon="copy"></i>复制 CSV</button>
+      <button class="btn" id="btn-md"><i data-icon="copy"></i>复制 Markdown</button>
+      <button class="btn" id="btn-download"><i data-icon="download"></i>下载 CSV</button>
+      <span class="divider"></span>
+      <button class="btn subtle" id="btn-sample"><i data-icon="sparkles"></i>示例</button>
+      <button class="btn subtle danger" id="btn-clear"><i data-icon="trash"></i>清空</button>
+      <span class="spacer"></span>
+      <label><input type="checkbox" class="checkbox" id="chk-wrap" checked />自动包装单个对象</label>
+    </div>
+
+    <div style="display:flex; flex-direction:column; flex: 0 0 300px; border-bottom:1px solid var(--border-strong);">
+      <div class="pane-header">
+        <span class="left"><span class="dot"></span>输入 JSON（对象数组）</span>
+        <span id="input-info">0 字符</span>
+      </div>
+      <div style="flex:1; position:relative;">
+        <textarea class="code-input" id="input" placeholder='粘贴对象数组，例如：&#10;[&#10;  { "id": 1, "name": "张三", "age": 28 },&#10;  { "id": 2, "name": "李四", "age": 34 }&#10;]'></textarea>
+      </div>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; min-height:0;">
+      <div class="pane-header">
+        <span class="left"><span class="dot green"></span>表格结果</span>
+        <div style="display:flex; align-items:center; gap:10px; text-transform:none; letter-spacing:0;">
+          <div class="search-box" id="search-box">
+            <i data-icon="search"></i>
+            <input type="text" id="search-input" placeholder="搜索单元格内容…" autocomplete="off" />
+            <button class="clear-btn" id="search-clear" title="清除"><i data-icon="x"></i></button>
+            <span class="match-count" id="match-count" style="display:none;"></span>
+          </div>
+          <span id="result-info"></span>
+        </div>
+      </div>
+      <div class="pane-content" id="result"></div>
+    </div>
+
+    <div class="status-bar" id="status-bar">
+      <span class="indicator"><span class="dot"></span><span class="label" id="status">就绪</span></span>
+      <span style="margin-left:auto;">按 <span class="kbd">⌘ Enter</span> 转换</span>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="../shared/icons.js"></script>
+  <script src="../shared/json-utils.js"></script>
+  <script src="../shared/table-utils.js"></script>
+  <script src="table.js"></script>
+</body>
+</html>
