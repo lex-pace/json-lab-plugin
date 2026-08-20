@@ -1,4 +1,4 @@
-# JSON Tools 发布清单
+# JSON Lab 发布清单
 
 从代码到商店上架的完整流程。每个版本发布时按此文档逐项核对。
 
@@ -21,7 +21,7 @@
 
 ### 1.3 文案层
 - [ ] `docs/store-listing.md` 中的文案已最终定稿
-- [ ] 邮箱 `author@example.com` 已替换为真实邮箱（涉及 `docs/privacy.html` 和 `index.html` 的作者弹窗）
+- [ ] 邮箱 `935342295@qq.com` 已替换为真实邮箱（涉及 `docs/privacy.html` 和 `index.html` 的作者弹窗）
 
 ---
 
@@ -47,7 +47,7 @@ cd JSON-Tools
 
 ### 方案 A：GitHub Pages（推荐，免费）
 ```bash
-# 假设你的仓库是 yourname/json-tools
+# 当前仓库：https://github.com/lex-pace/json-lab-plugin
 # 1. 把 docs/privacy.html 推到仓库的 docs/ 目录
 # 2. 仓库 Settings → Pages → Source 选 main 分支 / docs 目录
 # 3. 几分钟后即可访问：
@@ -106,7 +106,7 @@ Edge 与 Chrome 同为 Chromium 内核，MV3 扩展完全兼容，无需改代�
 2. 注册开发者（免费）
 3. 「提交新插件」→ 上传 zip
 4. AMO 要求：如果代码经过打包/混淆，需额外上传可读源码。
-   JSON Tools 是纯 vanilla JS、无构建，**直接上传即可**，无需额外源码包。
+   JSON Lab 是纯 vanilla JS、无构建，**直接上传即可**，无需额外源码包。
 5. Firefox 支持 `chrome.*` 命名空间，大概率无需改代码；
    若遇到兼容问题，可加一行 polyfill 或改用 `browser.*`。
 6. 审核通常 1-5 天

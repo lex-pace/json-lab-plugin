@@ -1,4 +1,4 @@
-# JSON Tools · 浏览器 JSON 工具箱
+# JSON Lab · 浏览器 JSON 工具箱
 
 一个纯前端的 JSON 处理浏览器插件（Chrome / Edge，Manifest V3），灵感来自 [FeHelper](https://fehelper.com/)，提供 **JSON 美化**、**JSON 对比**、**JSON 转表格** 三大功能，并支持自动捕获当前页 JSON、路径提取、字段忽略等增强能力。
 
@@ -71,7 +71,7 @@ JSON-Tools/
 2. 右上角打开「开发者模式」
 3. 点击「加载已解压的扩展程序」
 4. 选择本项目的 `JSON-Tools/` 目录
-5. 浏览器工具栏会出现「JSON Tools」图标，点击即可看到弹窗
+5. 浏览器工具栏会出现「JSON Lab」图标，点击即可看到弹窗
 
 ### 使用流程
 

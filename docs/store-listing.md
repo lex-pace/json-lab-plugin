@@ -1,4 +1,4 @@
-# JSON Tools 商店上架文案
+# JSON Lab 商店上架文案
 
 本文档汇总 Chrome Web Store / Edge Add-ons 上架所需的所有文案字段，可直接复制粘贴到上架表单。
 
@@ -8,7 +8,7 @@
 
 ### 商品名称
 ```
-JSON Tools - JSON 美化对比工具箱
+JSON Lab - JSON 美化对比工具箱
 ```
 > 长度限制：75 字符以内。建议带上核心关键词，便于搜索命中。
 
@@ -19,7 +19,7 @@ JSON 美化、JSON 对比、JSON 转表格，一站式前端工具箱，数据�
 
 ### 详细描述
 ```
-JSON Tools 是一款轻量、纯前端的 JSON 处理浏览器插件，专为开发者、调试人员和数据分析师设计。
+JSON Lab 是一款轻量、纯前端的 JSON 处理浏览器插件，专为开发者、调试人员和数据分析师设计。
 三大核心功能集成于一体，所有数据只在你的浏览器内处理，隐私安全零担忧。
 
 【三大核心功能】
@@ -87,7 +87,7 @@ storage：
 
 ### Name
 ```
-JSON Tools - JSON Beautify & Compare Toolbox
+JSON Lab - JSON Beautify & Compare Toolbox
 ```
 
 ### Summary (132 chars max)
@@ -97,7 +97,7 @@ Beautify, compare, and convert JSON to tables — a fully client-side toolbox. N
 
 ### Detailed Description
 ```
-JSON Tools is a lightweight, fully client-side JSON toolbox built for developers, debuggers, and data analysts.
+JSON Lab is a lightweight, fully client-side JSON toolbox built for developers, debuggers, and data analysts.
 Three core features in one extension. All processing happens in your browser — your data never leaves your device.
 
 [CORE FEATURES]
@@ -180,6 +180,6 @@ storage:
 5. **使用说明面板**：展示卡片式布局的「关于」页
 
 小宣传图（440×280）文案建议：
-- 主标题：JSON Tools
+- 主标题：JSON Lab
 - 副标题：JSON 美化 · 对比 · 转表格
 - 角标：纯前端 · 数据不出浏览器

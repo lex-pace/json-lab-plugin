@@ -815,14 +815,17 @@ body {
   gap: 8px;
 }
 
-/* 真实赞赏码：保留二维码四周留白，方便扫码 */
+/* 真实赞赏码：完整显示 + 四周留白 padding，保证扫码成功率 */
 .donation-qr {
   display: block;
-  width: 160px;
-  height: 160px;
-  object-fit: cover;
+  width: 240px;
+  height: 240px;
+  object-fit: contain;
   border-radius: var(--radius);
   background: #fff;
+  padding: 10px;
+  box-sizing: border-box;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
 }
 
 .qr-placeholder {
@@ -2270,7 +2273,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   flex-shrink: 0;
 }
 
@@ -2289,8 +2292,8 @@ body {
 }
 
 .donate-qr .donation-qr {
-  width: 112px;
-  height: 112px;
+  width: 180px;
+  height: 180px;
 }
 
 .qr-placeholder svg { width: 22px; height: 22px; }
