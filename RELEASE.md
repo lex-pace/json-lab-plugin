@@ -51,11 +51,11 @@ cd JSON-Tools
 # 1. 把 docs/privacy.html 推到仓库的 docs/ 目录
 # 2. 仓库 Settings → Pages → Source 选 main 分支 / docs 目录
 # 3. 几分钟后即可访问：
-#    https://yourname.github.io/json-tools/privacy.html
+#    https://lex-pace.github.io/json-lab-plugin/privacy.html
 ```
 
 ### 方案 B：自有域名
-把 `docs/privacy.html` 上传到你的服务器，例如 `https://yourdomain.com/json-tools/privacy`。
+把 `docs/privacy.html` 上传到你的服务器，例如 `https://yourdomain.com/json-lab-plugin/privacy`。
 
 上架表单填这个完整 URL 即可。
 

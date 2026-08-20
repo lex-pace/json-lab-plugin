@@ -54,9 +54,11 @@ JSON-Tools/
 │   └── content-extractor.js   # 按需注入的内容脚本（捕获当前页 JSON）
 ├── scripts/
 │   └── pack.sh                # 打包脚本（生成可上传的 zip）
-├── docs/                      # 发布相关文档
-│   ├── privacy.html           # 隐私政策（中英文，可托管 GitHub Pages）
-│   └── store-listing.md       # 商店上架文案（中英文）
+├── docs/                      # 发布相关文档与 GitHub Pages 推广站
+│   ├── index.html              # JSON Lab 推广首页
+│   ├── assets/                 # 推广站 Logo 等静态资源
+│   ├── privacy.html            # 隐私政策（中英文，可托管 GitHub Pages）
+│   └── store-listing.md        # 商店上架文案（中英文）
 ├── RELEASE.md                 # 发布清单
 └── README.md
 ```
@@ -112,7 +114,7 @@ python3 -m http.server 8765
 # 3. 上传到 Chrome Web Store / Edge Add-ons
 ```
 
-上架所需文案见 [`docs/store-listing.md`](./docs/store-listing.md)，隐私政策见 [`docs/privacy.html`](./docs/privacy.html)。
+项目推广页：<https://lex-pace.github.io/json-lab-plugin/>。上架所需文案见 [`docs/store-listing.md`](./docs/store-listing.md)，隐私政策见 [`docs/privacy.html`](./docs/privacy.html)。
 
 ## 浏览器兼容性
 

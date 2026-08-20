@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">JSON Lab logo</title>
+  <desc id="desc">A blue-violet rounded square containing JSON braces and connected data nodes</desc>
+  <defs>
+    <linearGradient id="bg" x1="12" y1="8" x2="116" y2="120" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1d4ed8"/>
+      <stop offset="0.55" stop-color="#2563eb"/>
+      <stop offset="1" stop-color="#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="25" y1="14" x2="94" y2="108" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff" stop-opacity=".24"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#172554" flood-opacity=".32"/>
+    </filter>
+  </defs>
+  <rect x="7" y="7" width="114" height="114" rx="30" fill="#0f172a" filter="url(#shadow)"/>
+  <rect x="10" y="10" width="108" height="108" rx="27" fill="url(#bg)"/>
+  <path d="M37 12h54c15 0 25 10 25 25v14C88 37 61 23 29 28c-7 1-13 4-19 8v-3c0-13 11-21 27-21Z" fill="url(#shine)"/>
+  <path d="M48 31h-7c-6 0-10 4-10 10v12c0 7-3 11-9 11 6 0 9 4 9 11v12c0 6 4 10 10 10h7" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M80 31h7c6 0 10 4 10 10v12c0 7 3 11 9 11-6 0-9 4-9 11v12c0 6-4 10-10 10h-7" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M58 64h12" stroke="#bfdbfe" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="56" cy="64" r="4.5" fill="#fbbf24" stroke="#fff" stroke-width="2"/>
+  <circle cx="72" cy="64" r="4.5" fill="#34d399" stroke="#fff" stroke-width="2"/>
+</svg>
