@@ -15,7 +15,7 @@
 - [ ] 深 / 浅主题切换正常
 
 ### 1.2 资产层
-- [ ] 根据 `icons/json-tools-logo.svg` 导出并替换 `icons/icon{16,48,128}.png` 正式图标
+- [ ] 根据 `icons/json-lab-logo.svg` 导出并替换 `icons/icon{16,48,128}.png` 正式图标
 - [ ] 商店截图已准备（见 `docs/store-listing.md` 末尾清单）
 - [ ] 隐私政策已托管到公网可访问 URL（见下方「托管隐私政策」）
 

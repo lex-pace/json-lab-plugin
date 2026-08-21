@@ -2,6 +2,8 @@
 
 一个纯前端的 JSON 处理浏览器插件（Chrome / Edge，Manifest V3），灵感来自 [FeHelper](https://fehelper.com/)，提供 **JSON 美化**、**JSON 对比**、**JSON 转表格** 三大功能，并支持自动捕获当前页 JSON、路径提取、字段忽略等增强能力。
 
+> 🌐 在线推广页：<https://lex-pace.github.io/json-lab-plugin/>，欢迎在线体验。
+
 - 🚀 零依赖、零构建：原生 HTML/CSS/JS，下载即用
 - 🔒 隐私安全：所有处理在本地浏览器完成，不请求任何网络
 - 🎨 三大功能一体化 SPA：美化 / 对比 / 转表格 + 使用说明
@@ -114,7 +116,7 @@ python3 -m http.server 8765
 # 3. 上传到 Chrome Web Store / Edge Add-ons
 ```
 
-项目推广页：<https://lex-pace.github.io/json-lab-plugin/>。上架所需文案见 [`docs/store-listing.md`](./docs/store-listing.md)，隐私政策见 [`docs/privacy.html`](./docs/privacy.html)。
+上架所需文案见 [`docs/store-listing.md`](./docs/store-listing.md)，隐私政策见 [`docs/privacy.html`](./docs/privacy.html)。
 
 ## 浏览器兼容性
 

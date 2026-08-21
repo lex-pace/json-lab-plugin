@@ -1,11 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "JSON Tools",
+  "name": "JSON Lab",
   "version": "1.0.0",
   "description": "JSON 美化、对比、转表格与当前页捕获 —— 隐私优先的浏览器工具箱",
   "action": {
     "default_popup": "popup/popup.html",
-    "default_title": "JSON Tools · 浏览器 JSON 工具箱"
+    "default_title": "JSON Lab · 浏览器 JSON 工具箱"
   },
   "icons": {
     "16": "icons/icon16.png",
