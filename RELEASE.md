@@ -15,7 +15,7 @@
 - [ ] 深 / 浅主题切换正常
 
 ### 1.2 资产层
-- [ ] 根据 `icons/json-lab-logo.svg` 导出并替换 `icons/icon{16,48,128}.png` 正式图标
+- [x] 根据 `icons/json-lab-logo.svg` 导出并替换 `icons/icon{16,48,128}.png` 正式图标
 - [ ] 商店截图已准备（见 `docs/store-listing.md` 末尾清单）
 - [ ] 隐私政策已托管到公网可访问 URL（见下方「托管隐私政策」）
 
@@ -88,10 +88,10 @@ cd JSON-Tools
 
 ---
 
-## 五、发布到 Edge Add-ons（同步上架，几乎零成本）
+## 五、发布到 Edge Add-ons（同步上架）
 
 1. 访问 https://partner.microsoft.com/dashboard/microsoftedge
-2. 用微软账号注册开发者（**免费**）
+2. 用微软账号注册个人开发者（支付 **$19 USD** 一次性注册费；具体金额以所在地区页面为准）
 3. 「创建新扩展」→ 上传**同一个** zip（manifest 无需修改）
 4. 填写与 Chrome 类似的商店信息（可复用 `docs/store-listing.md` 文案）
 5. 提交审核，通常 1-3 天

@@ -39,6 +39,7 @@ echo "📦 打包 JSON Tools v${VERSION} ..."
 zip -r -q "$PKG_PATH" . \
   -x "dist/*" \
   -x "scripts/*" \
+  -x "docs/*" \
   -x ".git/*" \
   -x ".gitignore" \
   -x ".DS_Store" \
