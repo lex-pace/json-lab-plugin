@@ -898,7 +898,6 @@ body {
   font-size: 13px;
   border: 1px solid var(--border-strong);
   border-radius: var(--radius);
-  overflow: hidden;
 }
 
 .data-table th,
@@ -920,18 +919,39 @@ body {
 }
 
 .data-table th {
-  background: var(--bg-elev);
+  background: var(--primary-soft);
   font-weight: 600;
   color: var(--text);
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 3;
   font-size: 12px;
   letter-spacing: 0.02em;
+  box-shadow: inset 0 1px 0 var(--border-strong), inset 0 -1px 0 var(--border-strong);
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.data-table thead tr:first-child th:first-child {
+  border-top-left-radius: var(--radius);
+}
+
+.data-table thead tr:first-child th:last-child {
+  border-top-right-radius: var(--radius);
 }
 
 .data-table tbody tr {
   transition: background var(--transition);
+}
+
+/* 斑马纹：深色主题用亮色条纹，浅色主题用暗色条纹 */
+.data-table tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme='light'] .data-table tbody tr:nth-child(even) {
+  background: rgba(0, 0, 0, 0.03);
 }
 
 .data-table tbody tr:hover {
@@ -959,6 +979,60 @@ body {
   user-select: none;
   width: 50px;
   white-space: nowrap;
+}
+
+/* —— 列头筛选图标 —— */
+.col-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 18px;
+  border-radius: 3px;
+  cursor: pointer;
+  color: var(--text-dim);
+  transition: all 150ms;
+  flex-shrink: 0;
+}
+
+.col-filter-btn svg {
+  width: 13px;
+  height: 13px;
+  fill: none;
+}
+
+.col-filter-btn:hover {
+  color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.data-table thead th.col-filtered {
+  background: rgba(59, 130, 246, 0.12) !important;
+  border-bottom: 2px solid var(--primary) !important;
+}
+
+.data-table thead th.col-filtered .col-filter-btn {
+  color: var(--primary);
+}
+
+/* —— 筛选值列表中的计数 —— */
+.filter-val {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.filter-count {
+  font-size: 11px;
+  color: var(--text-dim);
+  font-family: var(--mono);
+  flex-shrink: 0;
+  margin-left: 8px;
+  padding: 1px 6px;
+  background: var(--bg-input);
+  border-radius: 3px;
 }
 
 /* ============================================================
@@ -2332,6 +2406,41 @@ body {
 .sidebar.collapsed ~ .app-main .help-wrap {
   max-width: 100%;
 }
+
+/* ============================================================
+   表格增强：列筛选下拉（fixed 定位） + 全屏视图
+   ============================================================ */
+
+/* 列筛选下拉：用 fixed 定位挂到触发按钮正下方（按钮坐标来自 getBoundingClientRect） */
+.ms-dropdown.fixed-pos {
+  position: fixed;
+  right: auto;
+  width: 240px;
+  z-index: 9500;
+}
+
+.ms-actions {
+  display: flex;
+  gap: 6px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+  align-items: center;
+}
+
+.ms-actions .ms-count {
+  flex: 1;
+  font-size: 11px;
+  color: var(--text-mute);
+}
+
+/* 表格面板：折叠按钮小尺寸变体 */
+.btn.sm {
+  padding: 4px 10px;
+  font-size: 12px;
+  gap: 4px;
+}
+.btn.sm svg { width: 13px; height: 13px; }
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

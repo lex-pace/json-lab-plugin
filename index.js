@@ -728,8 +728,32 @@
     const searchClear = $('t-search-clear');
     const searchBox = $('t-search-box');
     const matchCount = $('t-match-count');
+    // 列筛选
+    const colBtn = $('t-col-btn');
+    const colDropdown = $('t-col-dropdown');
+    const colSearch = $('t-col-search');
+    const colOptions = $('t-col-options');
+    const colCount = $('t-col-count');
+    const colAllBtn = $('t-col-all');
+    const colNoneBtn = $('t-col-none');
+    // Excel 风格列头值筛选
+    const filterDropdown = $('t-filter-dropdown');
+    const filterSearch = $('t-filter-search');
+    const filterOptions = $('t-filter-options');
+    const filterCount = $('t-filter-count');
+    const filterAllBtn = $('t-filter-all');
+    const filterNoneBtn = $('t-filter-none');
+    // 折叠/展开输入区
+    const inputSection = $('t-input-section');
+    const expandBtn = $('t-expand-btn');
+
     let table = null;
     let searchTimer = null;
+    let hiddenCols = new Set(); // 被隐藏的列索引集合
+    let inputCollapsed = false; // 输入区是否折叠
+    let colOpenCtx = null; // 当前打开列筛选的上下文：'panel'
+    let colFilters = new Map(); // Excel 风格列头筛选：colIdx → Set of hidden values
+    let activeFilterCol = -1; // 当前打开筛选的列索引
 
     const SAMPLE = `[
   { "id": 1, "name": "张三", "age": 28, "tags": ["vip", "active"], "address": { "city": "北京", "geo": { "lat": 39.9, "lng": 116.4 } } },
@@ -777,14 +801,201 @@
       }
 
       table = { columns: r.columns, rows: r.rows };
-      const tableEl = TableUtils.renderHTMLTable(r.columns, r.rows);
+      // 新数据进来时重置隐藏列，避免上次的 hiddenCols 索引错位
+      hiddenCols.clear();
+      renderTable();
+      if (r.wrapped) resultInfo.textContent += ' · 已自动包装';
+      setStatus('t-status-bar', 't-status', '转换成功', 'ok');
+    }
+
+    // 根据当前 hiddenCols 计算可见列
+    function getVisibleColumns() {
+      if (!table) return { columns: [], colIdx: [] };
+      const colIdx = table.columns.map((_, i) => i).filter((i) => !hiddenCols.has(i));
+      const columns = colIdx.map((i) => table.columns[i]);
+      return { columns, colIdx };
+    }
+
+    // 渲染当前表格
+    function renderTable() {
+      if (!table) return;
+      const vis = getVisibleColumns();
+      const visibleRows = table.rows.map((row) => vis.colIdx.map((i) => row[i]));
+      const tableEl = TableUtils.renderHTMLTable(vis.columns, visibleRows);
+
+      // 给每个表头添加筛选图标（跳过索引列 #）
+      const ths = tableEl.querySelectorAll('thead th');
+      ths.forEach((th, thIdx) => {
+        if (th.textContent.trim() === '#') return;
+        const colOrigIdx = vis.colIdx[thIdx - 1]; // -1 因为第一列是索引列
+        if (colOrigIdx == null) return;
+        const filterBtn = document.createElement('span');
+        filterBtn.className = 'col-filter-btn';
+        filterBtn.dataset.colIdx = colOrigIdx;
+        filterBtn.title = '筛选此列';
+        filterBtn.innerHTML = Icons.get('filter');
+        filterBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openFilterDropdown(colOrigIdx, filterBtn);
+        });
+        th.appendChild(filterBtn);
+        // 标记有活跃筛选的列
+        if (colFilters.has(colOrigIdx) && colFilters.get(colOrigIdx).size > 0) {
+          th.classList.add('col-filtered');
+        }
+      });
+
       tableEl.querySelectorAll('tbody td').forEach((td) => {
         td.dataset.raw = td.textContent;
       });
+
+      result.innerHTML = '';
       result.appendChild(tableEl);
-      resultInfo.textContent = `${r.columns.length} 列 · ${r.rows.length} 行` + (r.wrapped ? ' · 已自动包装' : '');
-      setStatus('t-status-bar', 't-status', '转换成功', 'ok');
+      resultInfo.textContent = `${vis.columns.length}/${table.columns.length} 列 · ${table.rows.length} 行`;
+      applyFilters();
       applySearch();
+    }
+
+    // Excel 风格列头值筛选
+    function applyFilters() {
+      const tableEl = result.querySelector('.data-table');
+      if (!tableEl) return;
+      const vis = getVisibleColumns();
+      const rows = tableEl.querySelectorAll('tbody tr');
+
+      rows.forEach((tr) => {
+        const tds = tr.querySelectorAll('td');
+        let rowHidden = false;
+
+        // 对每个有活跃筛选的列，检查该行的值是否被排除
+        colFilters.forEach((hiddenVals, origColIdx) => {
+          if (hiddenVals.size === 0) return;
+          // 找到该列在可见列中的位置（thIdx - 1，因为第一列是索引）
+          const visIdx = vis.colIdx.indexOf(origColIdx);
+          if (visIdx < 0) return; // 列被隐藏了，跳过
+          const td = tds[visIdx + 1]; // +1 因为第一列是索引 td
+          if (!td) return;
+          const val = td.dataset.raw || td.textContent;
+          if (hiddenVals.has(val)) rowHidden = true;
+        });
+
+        tr.style.display = rowHidden ? 'none' : '';
+      });
+
+      // 更新结果信息
+      const visibleRows = tableEl.querySelectorAll('tbody tr:not([style*="display: none"])');
+      const totalRows = rows.length;
+      const activeFilters = Array.from(colFilters.values()).filter(s => s.size > 0).length;
+      let info = `${vis.columns.length}/${table.columns.length} 列 · ${visibleRows.length}/${totalRows} 行`;
+      if (activeFilters > 0) info += ` · ${activeFilters} 个筛选`;
+      resultInfo.textContent = info;
+    }
+
+    // 打开列头值筛选下拉
+    function openFilterDropdown(colIdx, anchorEl) {
+      if (!table) return;
+      activeFilterCol = colIdx;
+      const rect = anchorEl.getBoundingClientRect();
+      filterDropdown.classList.add('fixed-pos');
+      filterDropdown.style.left = rect.left + 'px';
+      filterDropdown.style.top = (rect.bottom + 4) + 'px';
+      filterDropdown.hidden = false;
+      if (filterSearch) filterSearch.value = '';
+      buildFilterOptions(colIdx, '');
+      Icons.mount(filterDropdown);
+      if (filterSearch) setTimeout(() => filterSearch.focus(), 50);
+    }
+
+    function closeFilterDropdown() {
+      filterDropdown.hidden = true;
+      activeFilterCol = -1;
+    }
+
+    function isFilterDropdownOpen() {
+      return filterDropdown && !filterDropdown.hidden;
+    }
+
+    function buildFilterOptions(colIdx, filterText) {
+      if (!table || colIdx < 0) return;
+      const vis = getVisibleColumns();
+      const visIdx = vis.colIdx.indexOf(colIdx);
+      if (visIdx < 0) return;
+
+      // 收集该列所有唯一值
+      const valueCounts = new Map();
+      table.rows.forEach((row) => {
+        const val = String(row[colIdx] ?? '');
+        valueCounts.set(val, (valueCounts.get(val) || 0) + 1);
+      });
+
+      // 排序：数字优先，然后字母
+      const sorted = Array.from(valueCounts.entries()).sort((a, b) => {
+        const na = Number(a[0]), nb = Number(b[0]);
+        if (!isNaN(na) && !isNaN(nb)) return na - nb;
+        return a[0].localeCompare(b[0], 'zh');
+      });
+
+      const hiddenVals = colFilters.get(colIdx) || new Set();
+      const f = (filterText || '').toLowerCase();
+      const items = f ? sorted.filter(([val]) => val.toLowerCase().includes(f)) : sorted;
+
+      filterOptions.innerHTML = '';
+      if (items.length === 0) {
+        filterOptions.innerHTML = '<div class="ms-empty">无匹配值</div>';
+      }
+
+      items.forEach(([val, count]) => {
+        const label = document.createElement('label');
+        label.className = 'ms-option';
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.checked = !hiddenVals.has(val);
+        cb.value = val;
+        cb.addEventListener('change', () => {
+          if (!colFilters.has(colIdx)) colFilters.set(colIdx, new Set());
+          const hs = colFilters.get(colIdx);
+          if (cb.checked) hs.delete(val);
+          else hs.add(val);
+          if (hs.size === 0) colFilters.delete(colIdx);
+          // 更新计数
+          const total = filterOptions.querySelectorAll('.ms-option').length;
+          const checked = filterOptions.querySelectorAll('.ms-option input:checked').length;
+          filterCount.textContent = `${checked}/${total} 项`;
+          applyFilters();
+          applySearch();
+          updateFilterHeaderMark(colIdx);
+        });
+        const txt = document.createElement('span');
+        txt.className = 'filter-val';
+        txt.textContent = val || '(空)';
+        const cnt = document.createElement('span');
+        cnt.className = 'filter-count';
+        cnt.textContent = count;
+        label.appendChild(cb);
+        label.appendChild(txt);
+        label.appendChild(cnt);
+        filterOptions.appendChild(label);
+      });
+
+      // 更新计数
+      const selected = f ? items.filter(([val]) => !hiddenVals.has(val)).length : valueCounts.size - (hiddenVals.size || 0);
+      filterCount.textContent = `${selected}/${valueCounts.size} 项`;
+    }
+
+    function updateFilterHeaderMark(colIdx) {
+      const tableEl = result.querySelector('.data-table');
+      if (!tableEl) return;
+      const vis = getVisibleColumns();
+      const visIdx = vis.colIdx.indexOf(colIdx);
+      if (visIdx < 0) return;
+      const th = tableEl.querySelectorAll('thead th')[visIdx + 1]; // +1 for index column
+      if (!th) return;
+      const hasFilter = colFilters.has(colIdx) && colFilters.get(colIdx).size > 0;
+      th.classList.toggle('col-filtered', hasFilter);
+    }
+
+    function renderFullscreen() {
+      // 已废弃：全屏 overlay 改为折叠输入区方案，此函数保留为空避免引用错误
     }
 
     function ensureTable() {
@@ -805,19 +1016,25 @@
     function doCSV() {
       const t = ensureTable();
       if (!t) return;
-      copyText(TableUtils.toCSV(t.columns, t.rows), 'CSV');
+      const vis = getVisibleColumns();
+      const rows = t.rows.map((row) => vis.colIdx.map((i) => row[i]));
+      copyText(TableUtils.toCSV(vis.columns, rows), 'CSV');
     }
 
     function doMD() {
       const t = ensureTable();
       if (!t) return;
-      copyText(TableUtils.toMarkdown(t.columns, t.rows), 'Markdown');
+      const vis = getVisibleColumns();
+      const rows = t.rows.map((row) => vis.colIdx.map((i) => row[i]));
+      copyText(TableUtils.toMarkdown(vis.columns, rows), 'Markdown');
     }
 
     function doDownload() {
       const t = ensureTable();
       if (!t) return;
-      const csv = '\uFEFF' + TableUtils.toCSV(t.columns, t.rows);
+      const vis = getVisibleColumns();
+      const rows = t.rows.map((row) => vis.colIdx.map((i) => row[i]));
+      const csv = '\uFEFF' + TableUtils.toCSV(vis.columns, rows);
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -830,7 +1047,7 @@
 
     // —— 搜索 ——
     function escapeRegExp(s) {
-      return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      return s.replace(/[.*?^${}()|[\]\\]/g, '\\$&');
     }
 
     function applySearch() {
@@ -866,6 +1083,8 @@
       let matchedCells = 0;
 
       rows.forEach((tr) => {
+        // 被筛选隐藏的行跳过搜索
+        if (tr.style.display === 'none') return;
         let rowHit = false;
         tr.querySelectorAll('td').forEach((td) => {
           const raw = td.dataset.raw != null ? td.dataset.raw : td.textContent;
@@ -913,6 +1132,87 @@
       matchCount.textContent = '';
     }
 
+    // —— 列筛选下拉面板 ——
+    function buildColOptions(filter) {
+      if (!table) return;
+      colOptions.innerHTML = '';
+      const f = (filter || '').toLowerCase();
+      const items = table.columns
+        .map((name, i) => ({ name, i }))
+        .filter((c) => !f || String(c.name).toLowerCase().includes(f));
+
+      if (items.length === 0) {
+        colOptions.innerHTML = '<div class="ms-empty">无匹配列</div>';
+        return;
+      }
+      items.forEach((c) => {
+        const label = document.createElement('label');
+        label.className = 'ms-option';
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.value = c.i;
+        cb.checked = !hiddenCols.has(c.i);
+        cb.addEventListener('change', () => {
+          const idx = Number(cb.value);
+          if (cb.checked) hiddenCols.delete(idx);
+          else hiddenCols.add(idx);
+          renderTable();
+          updateColCount();
+        });
+        const txt = document.createElement('span');
+        txt.textContent = c.name;
+        label.appendChild(cb);
+        label.appendChild(txt);
+        colOptions.appendChild(label);
+      });
+      updateColCount();
+    }
+
+    function updateColCount() {
+      if (!table) return;
+      const visible = table.columns.length - hiddenCols.size;
+      colCount.textContent = `${visible}/${table.columns.length} 列可见`;
+    }
+
+    function openColDropdown(anchorEl, ctx) {
+      if (!table) { toast('请先转换 JSON', 'err'); return; }
+      colOpenCtx = ctx;
+      const rect = anchorEl.getBoundingClientRect();
+      colDropdown.classList.add('fixed-pos');
+      colDropdown.style.left = rect.left + 'px';
+      colDropdown.style.top = (rect.bottom + 6) + 'px';
+      colDropdown.hidden = false;
+      buildColOptions('');
+      Icons.mount(colDropdown);
+      if (colSearch) { colSearch.value = ''; setTimeout(() => colSearch.focus(), 50); }
+    }
+
+    function closeColDropdown() {
+      colDropdown.hidden = true;
+      colOpenCtx = null;
+    }
+
+    function isColDropdownOpen() {
+      return colDropdown && !colDropdown.hidden;
+    }
+
+    // —— 折叠/展开输入区 ——
+    function toggleCollapse() {
+      inputCollapsed = !inputCollapsed;
+      if (inputCollapsed) {
+        // 输入区已折叠 → 按钮提示「展开」
+        inputSection.style.display = 'none';
+        expandBtn.innerHTML = '<i data-icon="chevronUp"></i>展开';
+        expandBtn.title = '展开输入区';
+      } else {
+        // 输入区已展开 → 按钮提示「收起」
+        inputSection.style.display = '';
+        expandBtn.innerHTML = '<i data-icon="chevronDown"></i>收起';
+        expandBtn.title = '收起输入区，表格占满空间';
+      }
+      Icons.mount(expandBtn);
+    }
+
     function init() {
       let timer = null;
       chkWrap.addEventListener('change', convert);
@@ -936,6 +1236,79 @@
         }
       });
       searchClear.addEventListener('click', resetSearch);
+
+      // Excel 风格列头值筛选
+      if (filterSearch) {
+        filterSearch.addEventListener('input', () => {
+          if (activeFilterCol >= 0) buildFilterOptions(activeFilterCol, filterSearch.value);
+        });
+      }
+      if (filterAllBtn) {
+        filterAllBtn.addEventListener('click', () => {
+          if (activeFilterCol < 0) return;
+          colFilters.delete(activeFilterCol);
+          buildFilterOptions(activeFilterCol, filterSearch ? filterSearch.value : '');
+          applyFilters();
+          applySearch();
+          updateFilterHeaderMark(activeFilterCol);
+        });
+      }
+      if (filterNoneBtn) {
+        filterNoneBtn.addEventListener('click', () => {
+          if (activeFilterCol < 0 || !table) return;
+          // 把该列所有值加入隐藏集合
+          const allVals = new Set();
+          table.rows.forEach((row) => allVals.add(String(row[activeFilterCol] ?? '')));
+          colFilters.set(activeFilterCol, allVals);
+          buildFilterOptions(activeFilterCol, filterSearch ? filterSearch.value : '');
+          applyFilters();
+          applySearch();
+          updateFilterHeaderMark(activeFilterCol);
+        });
+      }
+
+      // 列筛选（面板内）—— 按钮带 data-action，由 Table.columns() 直接打开，这里不绑 click
+      // 列筛选交互
+      if (colSearch) {
+        colSearch.addEventListener('input', () => buildColOptions(colSearch.value));
+      }
+      if (colAllBtn) {
+        colAllBtn.addEventListener('click', () => {
+          hiddenCols.clear();
+          buildColOptions(colSearch ? colSearch.value : '');
+          renderTable();
+        });
+      }
+      if (colNoneBtn) {
+        colNoneBtn.addEventListener('click', () => {
+          if (!table) return;
+          table.columns.forEach((_, i) => hiddenCols.add(i));
+          buildColOptions(colSearch ? colSearch.value : '');
+          renderTable();
+        });
+      }
+      // 点击下拉面板外部关闭
+      document.addEventListener('click', (e) => {
+        if (isColDropdownOpen() && !colDropdown.contains(e.target) &&
+            e.target !== colBtn && !colBtn.contains(e.target)) {
+          closeColDropdown();
+        }
+        if (isFilterDropdownOpen() && !filterDropdown.contains(e.target) &&
+            !e.target.closest('.col-filter-btn')) {
+          closeFilterDropdown();
+        }
+      });
+      // Esc 关闭下拉面板
+      document.addEventListener('keydown', (e) => {
+        if (e.key !== 'Escape') return;
+        if (isFilterDropdownOpen()) { closeFilterDropdown(); return; }
+        if (isColDropdownOpen()) closeColDropdown();
+      });
+      // 展开/折叠输入区
+      if (expandBtn) {
+        expandBtn.addEventListener('click', toggleCollapse);
+      }
+
       result.innerHTML = emptyState('table', '输入对象数组后点击「转换」', '顶层应为对象数组，列名取自字段；单个对象会自动包装');
       Icons.mount(result);
       setStatus('t-status-bar', 't-status', '就绪', '');
@@ -947,6 +1320,10 @@
       csv: doCSV,
       md: doMD,
       download: doDownload,
+      columns: () => {
+        if (isColDropdownOpen()) closeColDropdown();
+        else if (colBtn) openColDropdown(colBtn, 'panel');
+      },
       sample: () => { input.value = SAMPLE; convert(); },
       clear: () => { input.value = ''; convert(); },
       onEnter: convert,
@@ -1068,12 +1445,15 @@
     'table-csv': () => Table.csv(),
     'table-md': () => Table.md(),
     'table-download': () => Table.download(),
+    'table-columns': () => Table.columns(),
     'table-sample': () => Table.sample(),
     'table-clear': () => Table.clear(),
   };
 
   document.querySelectorAll('[data-action]').forEach((btn) => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
+      // 列筛选按钮需要阻止冒泡，避免 document 的「点击外部关闭」处理器立刻关闭刚打开的下拉
+      if (btn.getAttribute('data-action') === 'table-columns') e.stopPropagation();
       const fn = actions[btn.getAttribute('data-action')];
       if (fn) fn();
     });

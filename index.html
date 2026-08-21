@@ -223,7 +223,7 @@
           <label><input type="checkbox" class="checkbox" id="t-chk-flatten" checked />展平嵌套对象（address.city）</label>
         </div>
 
-        <div style="display:flex; flex-direction:column; flex: 0 0 300px; border-bottom:1px solid var(--border-strong);">
+        <div id="t-input-section" style="display:flex; flex-direction:column; flex: 0 0 300px; border-bottom:1px solid var(--border-strong);">
           <div class="pane-header">
             <span class="left"><span class="dot"></span>输入 JSON（对象数组）</span>
             <span id="t-input-info">0 字符</span>
@@ -237,9 +237,11 @@
           <div class="pane-header">
             <span class="left"><span class="dot green"></span>表格结果</span>
             <div style="display:flex; align-items:center; gap:10px; text-transform:none; letter-spacing:0;">
+              <button class="btn subtle sm" id="t-expand-btn" title="展开/收起输入区"><i data-icon="chevronDown"></i>展开</button>
+              <button class="btn subtle sm" data-action="table-columns" id="t-col-btn" title="显示/隐藏列"><i data-icon="columns"></i>列</button>
               <div class="search-box" id="t-search-box">
                 <i data-icon="search"></i>
-                <input type="text" id="t-search-input" placeholder="搜索单元格内容…" autocomplete="off" />
+                <input type="text" id="t-search-input" placeholder="搜索表格内容…" autocomplete="off" />
                 <button class="clear-btn" id="t-search-clear" title="清除"><i data-icon="x"></i></button>
                 <span class="match-count" id="t-match-count" style="display:none;"></span>
               </div>
@@ -254,6 +256,32 @@
           <span style="margin-left:auto;">按 <span class="kbd">⌘ Enter</span> 转换 · <span class="kbd">⌘ F</span> 搜索</span>
         </div>
       </section>
+
+      <!-- ====== 表格：列显示/隐藏下拉面板 ====== -->
+      <div class="ms-dropdown" id="t-col-dropdown" hidden>
+        <div class="ms-search">
+          <input type="text" id="t-col-search" placeholder="搜索列名…" autocomplete="off" />
+        </div>
+        <div class="ms-actions">
+          <span class="ms-count" id="t-col-count"></span>
+          <button class="ms-action" id="t-col-all">全选</button>
+          <button class="ms-action" id="t-col-none">清空</button>
+        </div>
+        <div class="ms-options" id="t-col-options"></div>
+      </div>
+
+      <!-- ====== 表格：Excel 风格列头值筛选下拉 ====== -->
+      <div class="ms-dropdown" id="t-filter-dropdown" hidden>
+        <div class="ms-search">
+          <input type="text" id="t-filter-search" placeholder="搜索值…" autocomplete="off" />
+        </div>
+        <div class="ms-actions">
+          <span class="ms-count" id="t-filter-count"></span>
+          <button class="ms-action" id="t-filter-all">全选</button>
+          <button class="ms-action" id="t-filter-none">清空</button>
+        </div>
+        <div class="ms-options" id="t-filter-options"></div>
+      </div>
 
       <!-- ====== 面板：使用说明 ====== -->
       <section class="panel" id="panel-help">
