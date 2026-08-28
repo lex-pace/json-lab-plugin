@@ -1434,7 +1434,12 @@ body {
   color: #fff;
   flex-shrink: 0;
   box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+  cursor: pointer;
+  transition: filter var(--transition), transform var(--transition);
 }
+
+.sidebar-head .logo:hover { filter: brightness(1.12); }
+.sidebar.collapsed .sidebar-head .logo:hover { transform: scale(1.06); }
 
 .sidebar-head .logo svg { width: 18px; height: 18px; }
 .sidebar-head .logo img { width: 32px; height: 32px; border-radius: 8px; display: block; }
@@ -1609,8 +1614,14 @@ body {
 [data-theme='light'] .foot-btn .theme-icon-light { display: block; }
 [data-theme='light'] .foot-btn .theme-icon-dark { display: none; }
 
-/* 折叠状态下的 tooltip */
-.sidebar.collapsed #theme-btn { width: 100%; }
+/* 折叠状态下：底部按钮纵向堆叠，各占一行，避免横向挤压导致图标不可见 */
+.sidebar.collapsed .sidebar-foot {
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sidebar.collapsed #theme-btn { width: 100%; flex: none; }
+.sidebar.collapsed #collapse-btn { width: 100%; flex: none; }
 .sidebar.collapsed .foot-btn .lbl { display: none; }
 
 .sidebar.collapsed #theme-btn:hover::after,

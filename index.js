@@ -1412,6 +1412,13 @@
     $('collapse-btn').addEventListener('click', () => {
       applyCollapsed(!$('sidebar').classList.contains('collapsed'));
     });
+    // 折叠后点击 Logo 也可展开侧边栏
+    const sidebarLogo = document.querySelector('.sidebar-head .logo');
+    if (sidebarLogo) {
+      sidebarLogo.addEventListener('click', () => {
+        if ($('sidebar').classList.contains('collapsed')) applyCollapsed(false);
+      });
+    }
     $('theme-btn').addEventListener('click', toggleTheme);
     initAuthorModal();
     // 说明面板的「打赏作者」按钮也打开同一个弹窗
