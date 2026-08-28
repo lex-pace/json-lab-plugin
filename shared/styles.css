@@ -30,6 +30,8 @@
   --primary-active: #2563eb; /* blue-600 */
   --primary-soft: rgba(59, 130, 246, 0.12);
   --primary-ring: rgba(59, 130, 246, 0.35);
+  --table-head-bg: #223451;  /* 实心表头色：primary-soft 叠加 bg-elev，滚动不透底 */
+  --table-head-filtered-bg: #24406b; /* 有活跃筛选时的表头实心色 */
 
   /* —— 语义色 —— */
   --success: #22c55e;
@@ -93,6 +95,8 @@
   --primary-active: #1d4ed8;   /* blue-700 */
   --primary-soft: rgba(37, 99, 235, 0.08);
   --primary-ring: rgba(37, 99, 235, 0.2);
+  --table-head-bg: #e7eefb;    /* 实心表头色：primary-soft 叠加 bg-elev */
+  --table-head-filtered-bg: #d8e5fb; /* 有活跃筛选时的表头实心色 */
 
   /* —— 语义色（浅色下加深） —— */
   --success: #16a34a;
@@ -919,7 +923,7 @@ body {
 }
 
 .data-table th {
-  background: var(--primary-soft);
+  background: var(--table-head-bg);
   font-weight: 600;
   color: var(--text);
   position: sticky;
@@ -1007,7 +1011,7 @@ body {
 }
 
 .data-table thead th.col-filtered {
-  background: rgba(59, 130, 246, 0.12) !important;
+  background: var(--table-head-filtered-bg, #24406b) !important;
   border-bottom: 2px solid var(--primary) !important;
 }
 

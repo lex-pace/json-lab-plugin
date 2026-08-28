@@ -765,6 +765,11 @@
       const text = input.value;
       inputInfo.textContent = text.length + ' 字符';
       result.innerHTML = '';
+      // 任何一次重新转换都清空旧的列筛选与下拉状态
+      colFilters.clear();
+      activeFilterCol = -1;
+      closeFilterDropdown();
+      closeColDropdown();
 
       if (!text.trim()) {
         table = null;
@@ -801,8 +806,12 @@
       }
 
       table = { columns: r.columns, rows: r.rows };
-      // 新数据进来时重置隐藏列，避免上次的 hiddenCols 索引错位
+      // 新数据进来时重置隐藏列和列值筛选，避免上次的索引/筛选残留
       hiddenCols.clear();
+      colFilters.clear();
+      activeFilterCol = -1;
+      closeFilterDropdown();
+      closeColDropdown();
       renderTable();
       if (r.wrapped) resultInfo.textContent += ' · 已自动包装';
       setStatus('t-status-bar', 't-status', '转换成功', 'ok');
@@ -882,13 +891,21 @@
         tr.style.display = rowHidden ? 'none' : '';
       });
 
-      // 更新结果信息
-      const visibleRows = tableEl.querySelectorAll('tbody tr:not([style*="display: none"])');
+      // 统计：筛选后满足的行数 / 总行数
+      let visibleCount = 0;
+      rows.forEach((tr) => { if (tr.style.display !== 'none') visibleCount++; });
       const totalRows = rows.length;
-      const activeFilters = Array.from(colFilters.values()).filter(s => s.size > 0).length;
-      let info = `${vis.columns.length}/${table.columns.length} 列 · ${visibleRows.length}/${totalRows} 行`;
-      if (activeFilters > 0) info += ` · ${activeFilters} 个筛选`;
+      const activeFilters = Array.from(colFilters.values()).filter((s) => s.size > 0).length;
+
+      let info;
+      if (activeFilters > 0) {
+        info = `${vis.columns.length}/${table.columns.length} 列 · 筛选后 ${visibleCount} 行 / 共 ${totalRows} 行 · ${activeFilters} 个筛选`;
+      } else {
+        info = `${vis.columns.length}/${table.columns.length} 列 · 共 ${totalRows} 行`;
+      }
       resultInfo.textContent = info;
+      setStatus('t-status-bar', 't-status',
+        activeFilters > 0 ? `筛选后 ${visibleCount} / ${totalRows} 条` : `共 ${totalRows} 条`, 'ok');
     }
 
     // 打开列头值筛选下拉
